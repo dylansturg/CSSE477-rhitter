@@ -33,7 +33,7 @@ public class GetSnippetTask extends RequestTaskBase {
 		dataSource.setServerName("dylans-pc.rose-hulman.edu");
 
 		try {
-			Connection conn = dataSource.getConnection("java", "Password1@");
+			Connection conn = dataSource.getConnection();
 			Statement statement = conn.createStatement();
 			ResultSet results = statement.executeQuery("SELECT * FROM Snippet");
 
