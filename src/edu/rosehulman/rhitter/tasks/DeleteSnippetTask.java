@@ -1,22 +1,25 @@
 package edu.rosehulman.rhitter.tasks;
 
 import interfaces.IHttpRequest;
-import interfaces.RequestTaskBase;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+
+import javax.sql.DataSource;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
-public class DeleteSnippetTask extends RequestTaskBase {
+import edu.rosehulman.rhitter.models.Snippet;
+
+public class DeleteSnippetTask extends RhitterTask {
 
 	private int id;
 
-	public DeleteSnippetTask(IHttpRequest request, int snippetId) {
-		super(request);
+	public DeleteSnippetTask(IHttpRequest request, DataSource dataSource,
+			int snippetId) {
+		super(request, dataSource);
 		snippetId = id;
 	}
 
@@ -24,29 +27,37 @@ public class DeleteSnippetTask extends RequestTaskBase {
 	public void run() {
 
 		MysqlDataSource dataSource = new MysqlDataSource();
-		dataSource.setUser("java");
-		dataSource.setPassword("Password1@");
-		dataSource.setDatabaseName("rhitter");
-		dataSource.setPort(3306);
-		dataSource.setServerName("dylans-pc.rose-hulman.edu");
+		Snippet deleted = null;
 
 		try {
-			Connection conn = dataSource.getConnection("java", "Password1@");
-			Statement statement = conn.createStatement();
-			ResultSet results = statement.executeQuery("SELECT * FROM Snippet");
-			
-			
-			
+			Connection conn = dataSource.getConnection();
+			PreparedStatement statement = conn
+					.prepareStatement("SELECT * FROM Snippet WHERE id = ?");
+			statement.setString(1, "" + id);
+
+			ResultSet results = statement.executeQuery();
+
+			if (results.next()) {
+				deleted = new Snippet(results);
+			}
+
 			results.close();
 			statement.close();
+
+			if (deleted != null) {
+				PreparedStatement deleteStatement = conn
+						.prepareStatement("DELETE FROM Snippet WHERE id = ?");
+				deleteStatement.setString(1, "" + id);
+				statement.execute();
+			}
+
 			conn.close();
 
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
+		completed = true;
 		super.run();
 	}
-
 }
