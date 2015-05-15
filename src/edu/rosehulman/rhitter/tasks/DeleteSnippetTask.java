@@ -6,11 +6,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 import javax.sql.DataSource;
 
+import protocol.HttpStatusCode;
+
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
+import edu.rosehulman.rhitter.RhitterResponse;
 import edu.rosehulman.rhitter.models.Snippet;
 
 public class DeleteSnippetTask extends RhitterSecuredTask {
@@ -27,31 +31,27 @@ public class DeleteSnippetTask extends RhitterSecuredTask {
 		Snippet deleted = null;
 
 		try {
+
+			validateUser();
 			Connection conn = dataSource.getConnection();
-			PreparedStatement statement = conn
-					.prepareStatement("SELECT * FROM Snippet WHERE id = ?");
-			statement.setString(1, "" + snippetId);
-
-			ResultSet results = statement.executeQuery();
-
-			if (results.next()) {
-				deleted = new Snippet(results);
-			}
-
-			results.close();
-			statement.close();
-
+			deleted = this.snippet;
 			if (deleted != null) {
 				PreparedStatement deleteStatement = conn
 						.prepareStatement("DELETE FROM Snippet WHERE id = ?");
 				deleteStatement.setString(1, "" + snippetId);
-				statement.execute();
+				deleteStatement.execute();
+				deleteStatement.close();
 			}
 
 			conn.close();
 
+			response = new RhitterResponse(HttpStatusCode.OK, deleted);
+
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} catch (UnauthorizedRequestException e) {
+			response = new ErrorTask.BasicResponse(HttpStatusCode.USER_ERROR,
+					new HashMap<String, String>());
 		}
 
 		completed = true;

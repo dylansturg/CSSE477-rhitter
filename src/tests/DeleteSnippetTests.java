@@ -8,7 +8,7 @@ public class DeleteSnippetTests {
 
 	@Test
 	public void testConnectionSetup() {
-		DeleteSnippetTask task = new DeleteSnippetTask(null, null, -1);
+		DeleteSnippetTask task = new DeleteSnippetTask(null, null, "", -1);
 
 		task.run();
 	}
