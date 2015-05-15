@@ -41,6 +41,11 @@ public class LoginUserTask extends RhitterTask {
 			ResultSet result = query.executeQuery();
 			if (result.next()) {
 				User authenticatedUser = new User(result);
+				
+				PreparedStatement deleteSession = conn.prepareStatement("DELETE FROM auth_tokens WHERE user_id = ?");
+				deleteSession.setInt(1, authenticatedUser.getId());
+				deleteSession.executeUpdate();
+				
 				AuthToken token = new AuthToken(authenticatedUser.getId());
 				token.update(dataSource);
 

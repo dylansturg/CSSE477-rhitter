@@ -8,5 +8,13 @@
         <string>POST</string>
       </expectedMethods>
     </servlet>
+
+    <servlet>
+      <classPath>edu.rosehulman.rhitter.RegisterResourceStrategy</classPath>
+      <relativeUrl>/register/</relativeUrl>
+      <expectedMethods>
+        <string>POST</string>
+      </expectedMethods>
+    </servlet>
   </servlets>
 </plugin>
