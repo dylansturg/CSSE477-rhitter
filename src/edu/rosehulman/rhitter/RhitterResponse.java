@@ -1,16 +1,18 @@
 package edu.rosehulman.rhitter;
 
+import interfaces.HttpResponseBase;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver;
-
 import protocol.HttpStatusCode;
 import protocol.Protocol;
-import interfaces.HttpResponseBase;
+
+import com.google.gson.Gson;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver;
 
 public class RhitterResponse extends HttpResponseBase {
 
@@ -32,10 +34,8 @@ public class RhitterResponse extends HttpResponseBase {
 	}
 
 	private void appendContent(Object content) {
-		XStream streamer = new XStream(new JsonHierarchicalStreamDriver());
-
-		streamer.setMode(XStream.NO_REFERENCES);
-		serializedContent = streamer.toXML(content);
+		Gson serializer = new Gson();
+		serializedContent = serializer.toJson(content);
 
 		if (serializedContent != null) {
 			putHeader(Protocol.CONTENT_LENGTH, serializedContent.length() + "");

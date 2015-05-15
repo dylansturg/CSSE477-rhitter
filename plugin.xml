@@ -1,0 +1,12 @@
+<plugin>
+  <pluginName>rhitter</pluginName>
+  <servlets>
+    <servlet>
+      <classPath>edu.rosehulman.rhitter.LoginResourceStrategy</classPath>
+      <relativeUrl>/login/</relativeUrl>
+      <expectedMethods>
+        <string>POST</string>
+      </expectedMethods>
+    </servlet>
+  </servlets>
+</plugin>
