@@ -50,6 +50,8 @@ public class RhitterSecuredTask extends RhitterTask {
 		ResultSet snippetResults = fetchSnippet.executeQuery();
 		if (snippetResults.next()) {
 			snippet = new Snippet(snippetResults);
+		} else {
+			throw new SnippetNotFoundException();
 		}
 		fetchSnippet.close();
 
@@ -76,6 +78,26 @@ public class RhitterSecuredTask extends RhitterTask {
 		}
 
 		public UnauthorizedRequestException() {
+			super();
+		}
+
+	}
+
+	public static class SnippetNotFoundException extends IllegalStateException {
+		/**
+ * 
+ */
+		private static final long serialVersionUID = 1555241584290622400L;
+
+		public SnippetNotFoundException(String msg, Throwable e) {
+			super(msg, e);
+		}
+
+		public SnippetNotFoundException(String msg) {
+			super(msg);
+		}
+
+		public SnippetNotFoundException() {
 			super();
 		}
 

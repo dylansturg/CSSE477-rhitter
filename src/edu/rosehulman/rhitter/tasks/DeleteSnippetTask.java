@@ -4,7 +4,6 @@ import interfaces.IHttpRequest;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 
@@ -31,7 +30,6 @@ public class DeleteSnippetTask extends RhitterSecuredTask {
 		Snippet deleted = null;
 
 		try {
-
 			validateUser();
 			Connection conn = dataSource.getConnection();
 			deleted = this.snippet;
@@ -41,16 +39,21 @@ public class DeleteSnippetTask extends RhitterSecuredTask {
 				deleteStatement.setString(1, "" + snippetId);
 				deleteStatement.execute();
 				deleteStatement.close();
+
+				response = new RhitterResponse(HttpStatusCode.OK, deleted);
 			}
 
 			conn.close();
 
-			response = new RhitterResponse(HttpStatusCode.OK, deleted);
-
 		} catch (SQLException e) {
-			e.printStackTrace();
+			response = new ErrorTask.BasicResponse(
+					HttpStatusCode.INTERNAL_ERROR,
+					new HashMap<String, String>());
 		} catch (UnauthorizedRequestException e) {
 			response = new ErrorTask.BasicResponse(HttpStatusCode.USER_ERROR,
+					new HashMap<String, String>());
+		} catch (SnippetNotFoundException e) {
+			response = new ErrorTask.BasicResponse(HttpStatusCode.NOT_FOUND,
 					new HashMap<String, String>());
 		}
 
