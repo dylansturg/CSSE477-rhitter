@@ -26,12 +26,17 @@ public class DeleteResourceStrategy extends RhitterStrategy {
 
 		try {
 			int id = Integer.parseInt(expectedId);
+			String token = request.getQueryString("token");
+			if (token == null || token.isEmpty()) {
+				throw new IllegalArgumentException(
+						"rhitter snippet DELETE requires an auth token");
+			}
 
 			DataSource dataSource = createDataSourceForRoute(fromRoute);
 
-			return new DeleteSnippetTask(request, dataSource, id);
+			return new DeleteSnippetTask(request, dataSource, token, id);
 
-		} catch (NumberFormatException exp) {
+		} catch (Exception exp) {
 			return new ErrorTask(request, HttpStatusCode.TEAPOT);
 		}
 

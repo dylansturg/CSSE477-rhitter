@@ -13,14 +13,11 @@ import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
 import edu.rosehulman.rhitter.models.Snippet;
 
-public class DeleteSnippetTask extends RhitterTask {
-
-	private int id;
+public class DeleteSnippetTask extends RhitterSecuredTask {
 
 	public DeleteSnippetTask(IHttpRequest request, DataSource dataSource,
-			int snippetId) {
-		super(request, dataSource);
-		snippetId = id;
+			String authToken, int snippetId) {
+		super(request, dataSource, authToken, snippetId);
 	}
 
 	@Override
@@ -33,7 +30,7 @@ public class DeleteSnippetTask extends RhitterTask {
 			Connection conn = dataSource.getConnection();
 			PreparedStatement statement = conn
 					.prepareStatement("SELECT * FROM Snippet WHERE id = ?");
-			statement.setString(1, "" + id);
+			statement.setString(1, "" + snippetId);
 
 			ResultSet results = statement.executeQuery();
 
@@ -47,7 +44,7 @@ public class DeleteSnippetTask extends RhitterTask {
 			if (deleted != null) {
 				PreparedStatement deleteStatement = conn
 						.prepareStatement("DELETE FROM Snippet WHERE id = ?");
-				deleteStatement.setString(1, "" + id);
+				deleteStatement.setString(1, "" + snippetId);
 				statement.execute();
 			}
 
