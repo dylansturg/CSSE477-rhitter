@@ -14,13 +14,6 @@ public class GetAllResourceStrategy extends RhitterStrategy {
 	public RequestTaskBase prepareEvaluation(IHttpRequest request,
 			IResourceRoute fromRoute) {
 
-		String path = request.getPath();
-		String[] parts = path.split("/");
-
-		if (parts.length < 1) {
-			return new ErrorTask(request, HttpStatusCode.BAD_REQUEST);
-		}
-
 		try {
 
 			DataSource dataSource = createDataSourceForRoute(fromRoute);

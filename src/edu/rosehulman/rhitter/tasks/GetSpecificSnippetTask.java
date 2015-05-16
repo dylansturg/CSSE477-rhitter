@@ -1,6 +1,7 @@
 package edu.rosehulman.rhitter.tasks;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -17,7 +18,9 @@ import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
 import edu.rosehulman.rhitter.RhitterResponse;
 import edu.rosehulman.rhitter.models.Snippet;
+import edu.rosehulman.rhitter.models.User;
 import edu.rosehulman.rhitter.tasks.RhitterSecuredTask.SnippetNotFoundException;
+import edu.rosehulman.rhitter.viewmodels.SnippetViewModel;
 import interfaces.IHttpRequest;
 import interfaces.RequestTaskBase;
 
@@ -38,12 +41,16 @@ public class GetSpecificSnippetTask extends RequestTaskBase {
 		try {
 			Connection conn = source.getConnection();
 			Statement statement = conn.createStatement();
-			ResultSet results = statement
-					.executeQuery("SELECT * FROM Snippet WHERE id = " + id);
+			
+			PreparedStatement query = conn
+					.prepareStatement("SELECT * FROM Snippet WHERE id = ?");
+			query.setInt(1, id);
 
-			List<Snippet> snippets = new ArrayList<Snippet>();
+			ResultSet results = query.executeQuery();			
+
+			List<SnippetViewModel> snippets = new ArrayList<SnippetViewModel>();
 			while (results.next()) {
-				snippets.add(new Snippet(results));
+				snippets.add(new SnippetViewModel(new Snippet(results), new User(results)));
 			}
 			if(snippets.size() < 1){
 				throw new SnippetNotFoundException();

@@ -32,5 +32,29 @@
         <string>DELETE</string>
       </expectedMethods>
     </servlet>
+    
+    <servlet>
+      <classPath>edu.rosehulman.rhitter.GetSnippetResourceStrategy</classPath>
+      <relativeUrl>/snippets/snippet/</relativeUrl>
+      <expectedMethods>
+        <string>GET</string>
+      </expectedMethods>
+    </servlet>
+    
+    <servlet>
+      <classPath>edu.rosehulman.rhitter.GetAllResourceStrategy</classPath>
+      <relativeUrl>/snippets/</relativeUrl>
+      <expectedMethods>
+        <string>GET</string>
+      </expectedMethods>
+    </servlet>
+
+    <servlet>
+      <classPath>edu.rosehulman.rhitter.PutResourceStrategy</classPath>
+      <relativeUrl>/snippets/</relativeUrl>
+      <expectedMethods>
+        <string>PUT</string>
+      </expectedMethods>
+    </servlet>
   </servlets>
 </plugin>
