@@ -19,9 +19,17 @@
 
     <servlet>
       <classPath>edu.rosehulman.rhitter.CreateResourceStrategy</classPath>
-      <relativeUrl>/snippet/</relativeUrl>
+      <relativeUrl>/snippets/</relativeUrl>
       <expectedMethods>
         <string>POST</string>
+      </expectedMethods>
+    </servlet>
+
+    <servlet>
+      <classPath>edu.rosehulman.rhitter.DeleteResourceStrategy</classPath>
+      <relativeUrl>/snippets/</relativeUrl>
+      <expectedMethods>
+        <string>DELETE</string>
       </expectedMethods>
     </servlet>
   </servlets>

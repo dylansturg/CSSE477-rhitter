@@ -26,7 +26,6 @@ public class DeleteSnippetTask extends RhitterSecuredTask {
 	@Override
 	public void run() {
 
-		MysqlDataSource dataSource = new MysqlDataSource();
 		Snippet deleted = null;
 
 		try {
