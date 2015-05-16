@@ -1,10 +1,11 @@
 package edu.rosehulman.rhitter.tasks;
 
+import interfaces.IHttpRequest;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,21 +15,14 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import protocol.HttpStatusCode;
-
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
-
 import edu.rosehulman.rhitter.RhitterResponse;
 import edu.rosehulman.rhitter.models.Snippet;
 import edu.rosehulman.rhitter.models.User;
-import edu.rosehulman.rhitter.tasks.RhitterSecuredTask.SnippetNotFoundException;
-import edu.rosehulman.rhitter.tasks.RhitterSecuredTask.UnauthorizedRequestException;
 import edu.rosehulman.rhitter.viewmodels.SnippetViewModel;
-import interfaces.IHttpRequest;
-import interfaces.RequestTaskBase;
 
 public class PutSnippetTask extends RhitterSecuredTask {
 	private String text;
-	
+
 	public PutSnippetTask(IHttpRequest request, DataSource dataSource,
 			String authToken, int snippetId, String snippetText) {
 		super(request, dataSource, authToken, snippetId);
@@ -42,21 +36,29 @@ public class PutSnippetTask extends RhitterSecuredTask {
 			Date date = new Date();
 			validateUser();
 			Connection conn = dataSource.getConnection();
-			
-			PreparedStatement statement = conn.prepareStatement("UPDATE Snippet SET text = ?, timestamp = ? WHERE id = ?");
+
+			PreparedStatement statement = conn
+					.prepareStatement("UPDATE Snippet SET text = ?, timestamp = ? WHERE id = ?");
 			statement.setString(1, text);
 			statement.setTimestamp(2, new Timestamp(date.getTime()));
 			statement.setInt(3, this.snippetId);
-			ResultSet results = statement.executeQuery();
-			
+			statement.executeUpdate();
+
+			PreparedStatement selectUpdated = conn
+					.prepareStatement("SELECT * FROM Snippet WHERE id = ?;");
+			selectUpdated.setInt(1, snippetId);
+			ResultSet results = selectUpdated.executeQuery();
+
 			List<SnippetViewModel> snippets = new ArrayList<SnippetViewModel>();
-			while (results.next()) {
-				snippets.add(new SnippetViewModel(new Snippet(results), new User(results)));
+			if (results.next()) {
+				Snippet updated = new Snippet(results);
+				snippets.add(new SnippetViewModel(updated, user));
+			} else {
+				throw new SnippetNotFoundException();
 			}
-			
+
 			response = new RhitterResponse(HttpStatusCode.OK, snippets.get(0));
 
-			results.close();
 			statement.close();
 			conn.close();
 
