@@ -1,5 +1,7 @@
 package edu.rosehulman.rhitter.tasks;
 
+import interfaces.IHttpRequest;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,14 +9,13 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 
-import interfaces.IHttpRequest;
-
 import javax.sql.DataSource;
 
 import protocol.HttpStatusCode;
 import edu.rosehulman.rhitter.RhitterResponse;
 import edu.rosehulman.rhitter.models.Snippet;
 import edu.rosehulman.rhitter.models.User;
+import edu.rosehulman.rhitter.viewmodels.SnippetViewModel;
 
 public class CreateSnippetTask extends RhitterTask {
 
@@ -37,8 +38,10 @@ public class CreateSnippetTask extends RhitterTask {
 			this.snippet.setTimestamp(new Date());
 
 			this.snippet.update(dataSource);
+			
+			SnippetViewModel viewModel = new SnippetViewModel(snippet, user);
 
-			response = new RhitterResponse(HttpStatusCode.CREATED, snippet);
+			response = new RhitterResponse(HttpStatusCode.CREATED, viewModel);
 
 		} catch (IllegalArgumentException e) {
 			response = new ErrorTask.BasicResponse(HttpStatusCode.USER_ERROR,

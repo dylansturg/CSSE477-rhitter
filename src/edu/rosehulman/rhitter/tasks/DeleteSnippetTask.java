@@ -15,6 +15,7 @@ import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
 import edu.rosehulman.rhitter.RhitterResponse;
 import edu.rosehulman.rhitter.models.Snippet;
+import edu.rosehulman.rhitter.viewmodels.SnippetViewModel;
 
 public class DeleteSnippetTask extends RhitterSecuredTask {
 
@@ -39,7 +40,9 @@ public class DeleteSnippetTask extends RhitterSecuredTask {
 				deleteStatement.execute();
 				deleteStatement.close();
 
-				response = new RhitterResponse(HttpStatusCode.OK, deleted);
+				SnippetViewModel viewModel = new SnippetViewModel(deleted, user);
+
+				response = new RhitterResponse(HttpStatusCode.OK, viewModel);
 			}
 
 			conn.close();
