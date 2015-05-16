@@ -16,5 +16,13 @@
         <string>POST</string>
       </expectedMethods>
     </servlet>
+
+    <servlet>
+      <classPath>edu.rosehulman.rhitter.CreateResourceStrategy</classPath>
+      <relativeUrl>/snippet/</relativeUrl>
+      <expectedMethods>
+        <string>POST</string>
+      </expectedMethods>
+    </servlet>
   </servlets>
 </plugin>

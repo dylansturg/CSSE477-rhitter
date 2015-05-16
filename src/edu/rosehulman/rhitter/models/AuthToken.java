@@ -64,7 +64,7 @@ public class AuthToken {
 							Statement.RETURN_GENERATED_KEYS);
 			insert.setInt(1, userId);
 			insert.setString(2, token);
-			insert.setDate(3, new java.sql.Date(expiration.getTime()));
+			insert.setTimestamp(3, new java.sql.Timestamp(expiration.getTime()));
 			insert.executeUpdate();
 
 			ResultSet keys = insert.getGeneratedKeys();

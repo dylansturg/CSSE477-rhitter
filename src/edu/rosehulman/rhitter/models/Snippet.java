@@ -1,10 +1,15 @@
 package edu.rosehulman.rhitter.models;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.sql.DataSource;
 
 public class Snippet {
 
@@ -47,7 +52,8 @@ public class Snippet {
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param id
+	 *            the id to set
 	 */
 	public void setId(int id) {
 		this.id = id;
@@ -61,7 +67,8 @@ public class Snippet {
 	}
 
 	/**
-	 * @param publisherId the publisherId to set
+	 * @param publisherId
+	 *            the publisherId to set
 	 */
 	public void setPublisherId(int publisherId) {
 		this.publisherId = publisherId;
@@ -75,7 +82,8 @@ public class Snippet {
 	}
 
 	/**
-	 * @param text the text to set
+	 * @param text
+	 *            the text to set
 	 */
 	public void setText(String text) {
 		this.text = text;
@@ -89,9 +97,31 @@ public class Snippet {
 	}
 
 	/**
-	 * @param timestamp the timestamp to set
+	 * @param timestamp
+	 *            the timestamp to set
 	 */
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	public void update(DataSource dataSource) throws SQLException {
+		Connection conn = dataSource.getConnection();
+		if (id > 0) { // update
+			// TODO implement update operation
+		} else { // insert
+			PreparedStatement insert = conn
+					.prepareStatement(
+							"INSERT INTO Snippet(publisher_id, text, timestamp) values(?, ?, ?);",
+							Statement.RETURN_GENERATED_KEYS);
+			insert.setInt(1, publisherId);
+			insert.setString(2, text);
+			insert.setTimestamp(3, new java.sql.Timestamp(timestamp.getTime()));
+
+			insert.executeUpdate();
+			ResultSet inserted = insert.getGeneratedKeys();
+			if (inserted.next()) {
+				id = inserted.getInt(1);
+			}
+		}
 	}
 }
