@@ -1,12 +1,14 @@
 package edu.rosehulman.rhitter.tasks;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -18,11 +20,13 @@ import edu.rosehulman.rhitter.RhitterResponse;
 import edu.rosehulman.rhitter.models.Snippet;
 import edu.rosehulman.rhitter.models.User;
 import edu.rosehulman.rhitter.viewmodels.SnippetViewModel;
+import edu.rosehulman.rhitter.viewmodels.UserViewModel;
 import interfaces.IHttpRequest;
 import interfaces.RequestTaskBase;
 
 public class GetAllSnippetTask extends RequestTaskBase {
 	DataSource source;
+
 	public GetAllSnippetTask(IHttpRequest request, DataSource datasource) {
 		super(request);
 		this.source = datasource;
@@ -33,12 +37,26 @@ public class GetAllSnippetTask extends RequestTaskBase {
 
 		try {
 			Connection conn = source.getConnection();
+
+			PreparedStatement getAllUsers = conn
+					.prepareStatement("SELECT * FROM User where id in (SELECT publisher_id FROM Snippet);");
+			ResultSet usersResults = getAllUsers.executeQuery();
+
+			Map<Integer, User> users = new HashMap<Integer, User>();
+			while (usersResults.next()) {
+				User user = new User(usersResults);
+				users.put(user.getId(), user);
+			}
+
 			Statement statement = conn.createStatement();
-			ResultSet results = statement.executeQuery("SELECT * FROM Snippet ORDER BY timestamp");
+			ResultSet results = statement
+					.executeQuery("SELECT * FROM Snippet ORDER BY timestamp");
 
 			List<SnippetViewModel> snippets = new ArrayList<SnippetViewModel>();
 			while (results.next()) {
-				snippets.add(new SnippetViewModel(new Snippet(results), new User(results)));
+				Snippet snip = new Snippet(results);
+				snippets.add(new SnippetViewModel(snip, users.get(snip
+						.getPublisherId())));
 			}
 
 			response = new RhitterResponse(HttpStatusCode.OK, snippets);
@@ -56,5 +74,4 @@ public class GetAllSnippetTask extends RequestTaskBase {
 		completed = true;
 		super.run();
 	}
-
 }
