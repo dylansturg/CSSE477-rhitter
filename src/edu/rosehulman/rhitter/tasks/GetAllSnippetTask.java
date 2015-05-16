@@ -5,35 +5,32 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import javax.sql.DataSource;
+
+import protocol.HttpStatusCode;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
+import edu.rosehulman.rhitter.RhitterResponse;
 import edu.rosehulman.rhitter.models.Snippet;
 import interfaces.IHttpRequest;
 import interfaces.RequestTaskBase;
 
-public class GetSnippetTask extends RequestTaskBase {
-
-	private Integer id;
-
-	public GetSnippetTask(IHttpRequest request, Integer snippetId) {
+public class GetAllSnippetTask extends RequestTaskBase {
+	DataSource source;
+	public GetAllSnippetTask(IHttpRequest request, DataSource datasource) {
 		super(request);
-		id = snippetId;
+		this.source = datasource;
 	}
 
 	@Override
 	public void run() {
 
-		MysqlDataSource dataSource = new MysqlDataSource();
-		dataSource.setUser("java");
-		dataSource.setPassword("Password1@");
-		dataSource.setDatabaseName("rhitter");
-		dataSource.setPort(3306);
-		dataSource.setServerName("dylans-pc.rose-hulman.edu");
-
 		try {
-			Connection conn = dataSource.getConnection();
+			Connection conn = source.getConnection();
 			Statement statement = conn.createStatement();
 			ResultSet results = statement.executeQuery("SELECT * FROM Snippet");
 
@@ -42,15 +39,19 @@ public class GetSnippetTask extends RequestTaskBase {
 				snippets.add(new Snippet(results));
 			}
 
+			response = new RhitterResponse(HttpStatusCode.OK, snippets);
+
 			results.close();
 			statement.close();
 			conn.close();
 
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			response = new ErrorTask.BasicResponse(
+					HttpStatusCode.INTERNAL_ERROR,
+					new HashMap<String, String>());
 		}
 
+		completed = true;
 		super.run();
 	}
 
