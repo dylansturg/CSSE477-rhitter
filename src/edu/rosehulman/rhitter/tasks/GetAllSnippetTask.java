@@ -50,7 +50,7 @@ public class GetAllSnippetTask extends RequestTaskBase {
 
 			Statement statement = conn.createStatement();
 			ResultSet results = statement
-					.executeQuery("SELECT * FROM Snippet ORDER BY timestamp");
+					.executeQuery("SELECT * FROM Snippet ORDER BY timestamp DESC");
 
 			List<SnippetViewModel> snippets = new ArrayList<SnippetViewModel>();
 			while (results.next()) {
